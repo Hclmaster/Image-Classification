@@ -418,7 +418,7 @@ tests.test_output(output)
 # * 返回输出
 # * 使用 `keep_prob` 向模型中的一个或多个层应用 [TensorFlow 的 Dropout](https://www.tensorflow.org/api_docs/python/tf/nn/dropout)
 
-# In[35]:
+# In[47]:
 
 def conv_net(x, keep_prob):
     """
@@ -433,7 +433,8 @@ def conv_net(x, keep_prob):
     #    conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides)
     conv_layer = conv2d_maxpool(x, 32, (2,2), (2,2), (2,2), (2,2))
     conv_layer = conv2d_maxpool(conv_layer, 64, (2,2), (2,2), (2,2), (2,2))
-    #conv_layer = conv2d_maxpool(conv_layer, 128, (5,5), (2,2), (2,2), (2,2))
+    conv_layer = conv2d_maxpool(conv_layer, 128, (2,2), (2,2), (2,2), (2,2))
+    tf.nn.dropout(conv_layer,keep_prob=0.6)
     
 
     # TODO: Apply a Flatten Layer
@@ -508,7 +509,7 @@ tests.test_conv_net(conv_net)
 # 注意：不需要返回任何内容。该函数只是用来优化神经网络。
 # 
 
-# In[36]:
+# In[48]:
 
 def train_neural_network(session, optimizer, keep_probability, feature_batch, label_batch):
     """
@@ -534,7 +535,7 @@ tests.test_train_nn(train_neural_network)
 # 实现函数 `print_stats` 以输出损失和验证准确率。使用全局变量 `valid_features` 和 `valid_labels` 计算验证准确率。使用保留率 `1.0` 计算损失和验证准确率（loss and validation accuracy）。
 # 
 
-# In[37]:
+# In[49]:
 
 def print_stats(session, feature_batch, label_batch, cost, accuracy):
     """
@@ -562,11 +563,11 @@ def print_stats(session, feature_batch, label_batch, cost, accuracy):
 #  * ...
 # * 设置 `keep_probability` 表示使用丢弃时保留节点的概率
 
-# In[38]:
+# In[50]:
 
 # TODO: Tune Parameters
 epochs = 50
-batch_size = 128
+batch_size = 256
 keep_probability = 0.7
 
 
@@ -575,7 +576,7 @@ keep_probability = 0.7
 # 我们先用单个部分，而不是用所有的 CIFAR-10 批次训练神经网络。这样可以节省时间，并对模型进行迭代，以提高准确率。最终验证准确率达到 50% 或以上之后，在下一部分对所有数据运行模型。
 # 
 
-# In[39]:
+# In[51]:
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL
@@ -602,7 +603,7 @@ with tf.Session() as sess:
 # 
 # 现在，单个 CIFAR-10 部分的准确率已经不错了，试试所有五个部分吧。
 
-# In[40]:
+# In[52]:
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL
@@ -637,7 +638,7 @@ with tf.Session() as sess:
 # 
 # 利用测试数据集测试你的模型。这将是最终的准确率。你的准确率应该高于 50%。如果没达到，请继续调整模型结构和参数。
 
-# In[41]:
+# In[53]:
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL
@@ -712,3 +713,23 @@ test_model()
 # 
 # 提交项目时，确保先运行所有单元，然后再保存记事本。将 notebook 文件另存为“dlnd_image_classification.ipynb”，再在目录 "File" -> "Download as" 另存为 HTML 格式。请在提交的项目中包含 “helper.py” 和 “problem_unittests.py” 文件。
 # 
+
+# ## 一些问题
+# 1.样本的数据是怎样看出来是随机的呢？
+# 
+# 2.One hot编码那里代码有一些问题，已经写在注释中了（为什么要把所有的标签都fit一遍呢?）
+# 
+# 3.扁平化层、全连接层、输出层不用快捷方法要怎么进行实现呢？（因为课程中并没有提到）
+# 
+# 4.为什么在单个CIFAR-10上训练的时候，将weights中的truncated_normal中的stddev设为0.1，然后accuracy就上升了（这个问题我找了好久，一开始还以为是卷积层和最大池化层出现了问题。）
+# 
+# 5.创建卷积模型那块，感觉参数有些难调，卷积核大小和kernel size for pool要怎么进行设置呢？还有strides要怎么选取比较好？
+#  
+#  还有为什么一开始在卷积层时num_outputs可以不断地增大？
+#  
+#  中间的fully_connected layer的num_outputs可以随便设吗？
+# 
+# 6.dropping中的keep_probability要怎样设置好？
+# 
+# 
+# > 问题有点多，但是还是麻烦请reviewer解答一下啦~ 谢谢！！
